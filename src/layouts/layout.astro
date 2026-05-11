@@ -1,0 +1,56 @@
+---
+import '../../src/styles/global.css';
+
+interface Props {
+  title?: string;
+}
+const { title = 'EL BALCÓN Barber Studio' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-[#0A0A0A] text-white antialiased">
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="#inicio" class="font-['Bebas_Neue'] text-3xl tracking-widest">
+          EL BALCÓN <span class="text-[#F5C518]">Barber Studio</span>
+        </a>
+        <div class="hidden md:flex items-center gap-8">
+          <a href="#servicios" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#F5C518] transition-colors">Servicios</a>
+          <a href="#galeria" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#F5C518] transition-colors">Galería</a>
+          <a href="#ubicacion" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#F5C518] transition-colors">Ubicación</a>
+          <a href="#reservar" class="bg-[#F5C518] text-black font-bold px-5 py-2 text-xs tracking-widest uppercase hover:bg-[#FF6B1A] transition-colors">
+            Reservar
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- CONTENIDO DE CADA PÁGINA -->
+    <main>
+      <slot />
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#111] border-t border-white/10 py-10">
+      <div class="max-w-7xl mx-auto px-6 text-center">
+        <p class="font-['Bebas_Neue'] text-2xl tracking-widest mb-2">
+          EL BALCÓN <span class="text-[#F5C518]">Barber Studio</span>
+        </p>
+        <p class="font-['Space_Mono'] text-xs text-gray-600">© 2026 EL BALCÓN Barber Studio — Todos los derechos reservados</p>
+      </div>
+    </footer>
+
+  </body>
+</html>

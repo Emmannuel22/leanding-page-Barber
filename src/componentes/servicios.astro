@@ -1,0 +1,89 @@
+---
+const services = [
+  {
+    icon: '✂️',
+    name: 'Corte Clásico',
+    desc: 'Corte a tijera o máquina con acabado profesional. Incluye lavado y secado.',
+    price: '$120',
+    time: '45 min',
+    tag: 'Popular',
+  },
+  {
+    icon: '💈',
+    name: 'Corte Fade',
+    desc: 'Degradado perfecto desde la piel hasta el largo deseado. Acabado limpio y preciso.',
+    price: '$140',
+    time: '50 min',
+    tag: null,
+  },
+  {
+    icon: '🪒',
+    name: 'Arreglo de Barba',
+    desc: 'Perfilado y arreglo de barba con navaja y productos premium para un look impecable.',
+    price: '$100',
+    time: '30 min',
+    tag: null,
+  },
+  {
+    icon: '👁️',
+    name: 'Cejas',
+    desc: 'Diseño y depilación de cejas para un acabado limpio y definido.',
+    price: '$40',
+    time: '15 min',
+    tag: null,
+  },
+];
+---
+
+<section id="servicios" class="py-24 bg-[#0A0A0A]">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- Header -->
+    <div class="mb-16">
+      <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase mb-3">— Lo que hacemos</p>
+      <h2 class="font-['Bebas_Neue'] text-6xl md:text-7xl text-white leading-none">
+        NUESTROS<br /><span class="text-[#BFFF00]">SERVICIOS</span>
+      </h2>
+    </div>
+
+    <!-- Grid 2x2 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-[#BFFF00]/20">
+      {services.map((service, i) => (
+        <div class="group relative bg-[#0A0A0A] p-8 hover:bg-[#111] transition-colors duration-300 overflow-hidden">
+
+          <!-- Número decorativo -->
+          <span class="absolute top-4 right-4 font-['Bebas_Neue'] text-7xl text-white/5 leading-none">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+
+          <!-- Tag -->
+          {service.tag && (
+            <div class="inline-block bg-[#BFFF00]/10 border border-[#BFFF00]/30 px-3 py-1 mb-4">
+              <span class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase">{service.tag}</span>
+            </div>
+          )}
+
+          <!-- Icono y nombre -->
+          <div class="text-3xl mb-4">{service.icon}</div>
+          <h3 class="font-['Bebas_Neue'] text-2xl tracking-wide text-white mb-2 group-hover:text-[#BFFF00] transition-colors duration-300">
+            {service.name}
+          </h3>
+
+          <!-- Descripción -->
+          <p class="text-sm text-gray-500 leading-relaxed mb-6">{service.desc}</p>
+
+          <!-- Precio y tiempo -->
+          <div class="flex items-center justify-between pt-4 border-t border-white/10">
+            <span class="font-['Bebas_Neue'] text-3xl text-[#BFFF00]">{service.price}</span>
+            <span class="font-['Space_Mono'] text-xs text-gray-500 tracking-widest">{service.time}</span>
+          </div>
+
+          <!-- Línea animada al hacer hover -->
+          <div class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#BFFF00] group-hover:w-full transition-all duration-500"></div>
+
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,135 @@
+---
+// Hero.astro — El Balcón Barber Studio
+---
+
+<section id="inicio" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+
+  <!-- Fondo decorativo -->
+  <div class="absolute inset-0">
+    <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-[#BFFF00]/5 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full border border-[#BFFF00]/20"></div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 pt-20">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+
+      <!-- Texto -->
+      <div class="space-y-6">
+
+        <!-- Badge de estatus -->
+        <div id="status-badge" class="inline-flex items-center gap-2 bg-[#BFFF00]/10 border border-[#BFFF00]/30 px-4 py-1.5">
+          <span id="status-dot" class="w-2 h-2 bg-[#BFFF00] rounded-full animate-pulse"></span>
+          <span id="status-text" class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase">
+            Abierto hoy · 9am – 8pm
+          </span>
+        </div>
+
+        <!-- Título -->
+        <h1 class="font-['Bebas_Neue'] text-7xl md:text-8xl leading-none tracking-wider">
+          EL BALCÓN<br /><span class="text-[#BFFF00]">BARBER STUDIO</span>
+        </h1>
+
+        <!-- Descripción -->
+        <p class="text-lg text-gray-400 max-w-md leading-relaxed">
+          No solo un corte. Una <span class="text-white font-semibold">identidad</span>.
+          Barbería urbana donde el estilo se encuentra con la precisión artesanal.
+        </p>
+
+        <!-- Botones -->
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="#reservar" class="bg-[#BFFF00] text-black font-bold px-8 py-4 text-sm tracking-widest uppercase hover:bg-[#BFFF00]/80 transition-colors">
+            Reservar Cita →
+          </a>
+          <a href="#servicios" class="border border-white/20 text-white px-8 py-4 text-sm tracking-widest uppercase hover:border-[#BFFF00] hover:text-[#BFFF00] transition-colors">
+            Ver Servicios
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex gap-10 pt-6 border-t border-white/10">
+          <div>
+            <p class="font-['Bebas_Neue'] text-4xl text-[#BFFF00]">8+</p>
+            <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Años de exp.</p>
+          </div>
+          <div>
+            <p class="font-['Bebas_Neue'] text-4xl text-[#BFFF00]">500+</p>
+            <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Clientes</p>
+          </div>
+          <div>
+            <p class="font-['Bebas_Neue'] text-4xl text-[#BFFF00]">4.9★</p>
+            <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Calificación</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Logo / Visual -->
+      <div class="hidden md:flex justify-center">
+        <div class="relative w-80 h-[480px] bg-[#1A1A1A] border border-white/10 flex items-center justify-center">
+          
+          <!-- Reemplaza esta imagen con tu logo real -->
+          <!-- Pon tu logo en /public/images/logo.png y descomenta la línea de abajo -->
+          <!-- <img src="/images/logo.png" alt="El Balcón Barber Studio" class="w-48 object-contain" /> -->
+          
+          <div class="text-center space-y-3">
+            <div class="text-6xl">💈</div>
+            <p class="font-['Bebas_Neue'] text-2xl text-white tracking-widest">EL BALCÓN</p>
+            <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase">Barber Studio</p>
+            <p class="font-['Space_Mono'] text-xs text-gray-700 mt-4">← pon tu logo aquí</p>
+          </div>
+
+          <!-- Etiqueta inferior -->
+          <div class="absolute bottom-0 left-0 right-0 bg-[#BFFF00] p-4">
+            <p class="font-['Bebas_Neue'] text-xl tracking-widest text-black">PREMIUM CUTS</p>
+            <p class="font-['Space_Mono'] text-xs text-black/60">EL BALCÓN — BARBER STUDIO</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<script>
+  // Leer estatus guardado en localStorage
+  const savedStatus = localStorage.getItem('barber_status') ?? 'open';
+
+  const badge = document.getElementById('status-badge');
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('status-text');
+
+  function applyStatus(status: string) {
+    if (status === 'open') {
+      badge?.classList.remove('bg-red-500/10', 'border-red-500/30');
+      badge?.classList.add('bg-[#BFFF00]/10', 'border-[#BFFF00]/30');
+      dot?.classList.remove('bg-red-500');
+      dot?.classList.add('bg-[#BFFF00]');
+      if (text) text.textContent = 'Abierto hoy · 9am – 8pm';
+      text?.classList.remove('text-red-400');
+      text?.classList.add('text-[#BFFF00]');
+    } else {
+      badge?.classList.add('bg-red-500/10', 'border-red-500/30');
+      badge?.classList.remove('bg-[#BFFF00]/10', 'border-[#BFFF00]/30');
+      dot?.classList.add('bg-red-500');
+      dot?.classList.remove('bg-[#BFFF00]');
+      if (text) text.textContent = 'Cerrado por hoy';
+      text?.classList.add('text-red-400');
+      text?.classList.remove('text-[#BFFF00]');
+    }
+  }
+
+  applyStatus(savedStatus);
+
+  // Escuchar cambios desde el panel del dueño
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'barber_status') {
+      applyStatus(e.newValue ?? 'open');
+    }
+  });
+
+  // También escuchar evento custom (mismo tab)
+  window.addEventListener('statusChanged', (e: any) => {
+    applyStatus(e.detail.status);
+  });
+</script>

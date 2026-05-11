@@ -1,0 +1,99 @@
+---
+const works = [
+  { id: 1, title: 'Fade Skin', tag: 'Corte' },
+  { id: 2, title: 'Beard Trim', tag: 'Barba' },
+  { id: 3, title: 'Crew Cut', tag: 'Corte' },
+  { id: 4, title: 'Drop Fade', tag: 'Fade' },
+  { id: 5, title: 'Full Combo', tag: 'Combo' },
+  { id: 6, title: 'Mid Fade', tag: 'Fade' },
+];
+
+const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
+---
+
+<section id="galeria" class="py-24 bg-[#111]">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <!-- Header -->
+    <div class="mb-16">
+      <p class="font-['Space_Mono'] text-xs text-[#F5C518] tracking-widest uppercase mb-3">— Nuestro trabajo</p>
+      <h2 class="font-['Bebas_Neue'] text-6xl md:text-7xl text-white leading-none">
+        GALERÍA
+      </h2>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-wrap gap-2 mb-10">
+      {tags.map((tag, i) => (
+        <button
+          data-filter={tag}
+          class={`gallery-filter font-['Space_Mono'] text-xs tracking-widest uppercase px-4 py-2 border transition-all duration-300 ${
+            i === 0
+              ? 'bg-[#F5C518] text-black border-[#F5C518]'
+              : 'text-gray-500 border-white/20 hover:border-[#F5C518] hover:text-[#F5C518]'
+          }`}
+        >
+          {tag}
+        </button>
+      ))}
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {works.map((work, i) => (
+        <div
+          data-tag={work.tag}
+          class="gallery-item group relative aspect-square bg-[#1A1A1A] border border-white/10 overflow-hidden cursor-pointer"
+        >
+          <!-- Placeholder — reemplaza con tus fotos reales -->
+          <div class="w-full h-full flex items-center justify-center">
+            <div class="text-center">
+              <div class="text-4xl mb-2">📸</div>
+              <p class="font-['Space_Mono'] text-xs text-gray-700">Foto {work.id}</p>
+            </div>
+          </div>
+
+          <!-- Overlay hover -->
+          <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2">
+            <span class="font-['Space_Mono'] text-xs text-[#F5C518] tracking-widest uppercase">{work.tag}</span>
+            <span class="font-['Bebas_Neue'] text-2xl text-white tracking-wide">{work.title}</span>
+          </div>
+
+          <!-- Número -->
+          <div class="absolute top-3 left-3 font-['Space_Mono'] text-xs text-gray-600 group-hover:text-[#F5C518] transition-colors duration-300">
+            {String(i + 1).padStart(2, '0')}
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  const filterBtns = document.querySelectorAll('.gallery-filter');
+  const items = document.querySelectorAll('.gallery-item');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.getAttribute('data-filter');
+
+      // Actualizar botones
+      filterBtns.forEach(b => {
+        b.classList.remove('bg-[#F5C518]', 'text-black', 'border-[#F5C518]');
+        b.classList.add('text-gray-500', 'border-white/20');
+      });
+      btn.classList.add('bg-[#F5C518]', 'text-black', 'border-[#F5C518]');
+      btn.classList.remove('text-gray-500', 'border-white/20');
+
+      // Filtrar
+      items.forEach(item => {
+        if (filter === 'Todos' || item.getAttribute('data-tag') === filter) {
+          (item as HTMLElement).style.display = 'block';
+        } else {
+          (item as HTMLElement).style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
