@@ -23,21 +23,49 @@ const { title = 'EL BALCÓN Barber Studio' } = Astro.props;
     <!-- NAVBAR -->
     <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0A0A0A]/80 backdrop-blur-md border-b border-white/10">
       <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#inicio" class="font-['Bebas_Neue'] text-3xl tracking-widest">
-          EL BALCÓN <span class="text-[#F5C518]">Barber Studio</span>
+
+        <!-- Logo -->
+        <a href="#inicio" class="font-['Bebas_Neue'] text-2xl tracking-widest">
+          EL BALCÓN <span class="text-[#BFFF00]">Barber Studio</span>
         </a>
+
+        <!-- Links desktop -->
         <div class="hidden md:flex items-center gap-8">
-          <a href="#servicios" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#F5C518] transition-colors">Servicios</a>
-          <a href="#galeria" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#F5C518] transition-colors">Galería</a>
-          <a href="#ubicacion" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#F5C518] transition-colors">Ubicación</a>
-          <a href="#reservar" class="bg-[#F5C518] text-black font-bold px-5 py-2 text-xs tracking-widest uppercase hover:bg-[#FF6B1A] transition-colors">
+          <a href="#servicios" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Servicios</a>
+          <a href="#galeria" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Galería</a>
+          <a href="#calendario" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Calendario</a>
+          <a href="#ubicacion" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Ubicación</a>
+          <a href="#reservar" class="bg-[#BFFF00] text-black font-bold px-5 py-2 text-xs tracking-widest uppercase hover:bg-[#BFFF00]/80 transition-colors">
             Reservar
           </a>
         </div>
+
+        <!-- Hamburger móvil -->
+        <button id="menu-btn" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menú">
+          <span class="w-6 h-0.5 bg-white block transition-all duration-300"></span>
+          <span class="w-6 h-0.5 bg-white block transition-all duration-300"></span>
+          <span class="w-4 h-0.5 bg-[#BFFF00] block transition-all duration-300"></span>
+        </button>
+
+      </div>
+
+      <!-- Menú móvil -->
+      <div id="mobile-menu" class="hidden md:hidden bg-[#111] border-t border-white/10 px-6 py-6">
+        <ul class="flex flex-col gap-5">
+          <li><a href="#servicios" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Servicios</a></li>
+          <li><a href="#galeria" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Galería</a></li>
+          <li><a href="#calendario" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Calendario</a></li>
+          <li><a href="#ubicacion" class="font-['Space_Mono'] text-xs tracking-widest uppercase text-gray-400 hover:text-[#BFFF00] transition-colors">Ubicación</a></li>
+          <li>
+            <a href="#reservar" class="inline-block bg-[#BFFF00] text-black font-bold px-5 py-2 text-xs tracking-widest uppercase hover:bg-[#BFFF00]/80 transition-colors">
+              Reservar
+            </a>
+          </li>
+        </ul>
       </div>
     </nav>
 
-    <!-- CONTENIDO DE CADA PÁGINA -->
+    <!-- CONTENIDO -->
     <main>
       <slot />
     </main>
@@ -46,11 +74,26 @@ const { title = 'EL BALCÓN Barber Studio' } = Astro.props;
     <footer class="bg-[#111] border-t border-white/10 py-10">
       <div class="max-w-7xl mx-auto px-6 text-center">
         <p class="font-['Bebas_Neue'] text-2xl tracking-widest mb-2">
-          EL BALCÓN <span class="text-[#F5C518]">Barber Studio</span>
+          EL BALCÓN <span class="text-[#BFFF00]">Barber Studio</span>
         </p>
         <p class="font-['Space_Mono'] text-xs text-gray-600">© 2026 EL BALCÓN Barber Studio — Todos los derechos reservados</p>
       </div>
     </footer>
+
+    <!-- Script menú móvil -->
+    <script>
+      const btn = document.getElementById('menu-btn');
+      const menu = document.getElementById('mobile-menu');
+
+      btn?.addEventListener('click', () => {
+        menu?.classList.toggle('hidden');
+      });
+
+      // Cerrar al hacer click en un link
+      menu?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => menu.classList.add('hidden'));
+      });
+    </script>
 
   </body>
 </html>

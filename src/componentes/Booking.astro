@@ -124,6 +124,13 @@
           ></textarea>
         </div>
 
+        <!-- Aviso de cerrado -->
+        <div id="closed-warning" class="hidden bg-red-500/10 border border-red-500/30 p-4 text-center">
+          <p class="font-['Space_Mono'] text-xs text-red-400 tracking-widest uppercase">
+            🔒 La barbería está cerrada en este momento. No se pueden realizar reservas.
+          </p>
+        </div>
+
         <!-- Botón -->
         <button
           id="submit-btn"
@@ -148,23 +155,106 @@
   const btn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-msg');
 
+  // Verificar estatus al cargar
+  function checkStatus() {
+    const status = localStorage.getItem('barber_status') ?? 'open';
+    if (status === 'closed') {
+      blockForm();
+    } else {
+      unblockForm();
+    }
+  }
+
+  function blockForm() {
+    if (!btn) return;
+    (btn as HTMLButtonElement).disabled = true;
+    btn.textContent = '🔒 Reservas no disponibles';
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+    btn.classList.remove('hover:bg-[#BFFF00]/80');
+
+    // Mostrar aviso
+    const warning = document.getElementById('closed-warning');
+    warning?.classList.remove('hidden');
+  }
+
+  function unblockForm() {
+    if (!btn) return;
+    (btn as HTMLButtonElement).disabled = false;
+    btn.textContent = 'Confirmar Reserva →';
+    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+    btn.classList.add('hover:bg-[#BFFF00]/80');
+
+    const warning = document.getElementById('closed-warning');
+    warning?.classList.add('hidden');
+  }
+
+  checkStatus();
+
+  // Escuchar cambios de estatus en tiempo real
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'barber_status') checkStatus();
+  });
+
+  window.addEventListener('statusChanged', (e: any) => {
+    if (e.detail.status === 'closed') {
+      blockForm();
+    } else {
+      unblockForm();
+    }
+  });
+
   btn?.addEventListener('click', () => {
-    const name = (document.getElementById('name') as HTMLInputElement)?.value;
-    const phone = (document.getElementById('phone') as HTMLInputElement)?.value;
+    const status = localStorage.getItem('barber_status') ?? 'open';
+    if (status === 'closed') return;
+
+    const name = (document.getElementById('name') as HTMLInputElement)?.value.trim();
+    const phone = (document.getElementById('phone') as HTMLInputElement)?.value.trim();
     const service = (document.getElementById('service') as HTMLSelectElement)?.value;
     const date = (document.getElementById('date') as HTMLInputElement)?.value;
     const time = (document.getElementById('time') as HTMLSelectElement)?.value;
+    const notes = (document.getElementById('notes') as HTMLTextAreaElement)?.value.trim();
 
     if (!name || !phone || !service || !date || !time) {
       alert('Por favor completa todos los campos requeridos.');
       return;
     }
 
-    btn.textContent = 'Enviando...';
+    // Validar fecha y hora
+    const now = new Date();
+    const [year, month, day] = date.split('-').map(Number);
+    const [hour] = time.split(':').map(Number);
+    const selectedDate = new Date(year, month - 1, day, hour, 0, 0, 0);
+    const minAllowed = new Date(now.getTime() + 60 * 60 * 1000);
+
+    if (selectedDate < minAllowed) {
+      alert('⚠️ Elige un horario con al menos 1 hora de anticipación.');
+      return;
+    }
+
+    // Verificar hora ocupada
+    const appointments = JSON.parse(localStorage.getItem('appointments') ?? '[]');
+    const conflict = appointments.some(
+      (a: any) => a.date === date && a.time === time && a.status !== 'rejected'
+    );
+
+    if (conflict) {
+      alert('⚠️ Ese horario ya está reservado. Por favor elige otra hora.');
+      return;
+    }
+
+    // Guardar cita
+    appointments.push({
+      name, phone, service, date, time, notes,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    });
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+
+    (btn as HTMLButtonElement).textContent = 'Enviando...';
     (btn as HTMLButtonElement).disabled = true;
 
     setTimeout(() => {
-      btn.classList.add('hidden');
+      btn?.classList.add('hidden');
       successMsg?.classList.remove('hidden');
     }, 1200);
   });

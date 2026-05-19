@@ -1,0 +1,224 @@
+---
+// Admin.astro — Panel del dueño
+---
+
+<!-- Botón flotante para abrir el panel -->
+<button
+  id="admin-btn"
+  class="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] border border-white/20 text-white w-12 h-12 flex items-center justify-center hover:border-[#BFFF00] hover:text-[#BFFF00] transition-all duration-300"
+  aria-label="Panel admin"
+>
+  🔐
+</button>
+
+<!-- Modal del panel -->
+<div id="admin-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center px-4">
+  <div class="bg-[#111] border border-white/10 w-full max-w-md p-8 relative">
+
+    <!-- Cerrar -->
+    <button id="close-modal" class="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors text-xl">✕</button>
+
+    <!-- Login -->
+    <div id="login-panel">
+      <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase mb-2">— Acceso restringido</p>
+      <h2 class="font-['Bebas_Neue'] text-4xl text-white mb-6">PANEL DEL DUEÑO</h2>
+
+      <div class="space-y-4">
+        <div class="space-y-1">
+          <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Contraseña</label>
+          <input
+            type="password"
+            id="admin-password"
+            placeholder="••••••••"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors placeholder-gray-700"
+          />
+        </div>
+        <button
+          id="login-btn"
+          class="w-full bg-[#BFFF00] text-black font-bold py-3 text-sm tracking-widest uppercase hover:bg-[#BFFF00]/80 transition-colors"
+        >
+          Entrar →
+        </button>
+        <p id="login-error" class="hidden font-['Space_Mono'] text-xs text-red-400 text-center">Contraseña incorrecta</p>
+      </div>
+    </div>
+
+    <!-- Panel de control (oculto hasta hacer login) -->
+    <div id="control-panel" class="hidden space-y-8">
+      <div>
+        <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase mb-2">— Bienvenido</p>
+        <h2 class="font-['Bebas_Neue'] text-4xl text-white">PANEL DE CONTROL</h2>
+      </div>
+
+      <!-- Estatus -->
+      <div class="bg-[#0A0A0A] border border-white/10 p-6">
+        <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest mb-4">Estado de la barbería</p>
+        <div class="flex items-center justify-between">
+          <div>
+            <p id="status-label" class="font-['Bebas_Neue'] text-2xl text-white">ABIERTO</p>
+            <p class="font-['Space_Mono'] text-xs text-gray-600">Se muestra en la página principal</p>
+          </div>
+          <!-- Toggle -->
+          <button
+            id="status-toggle"
+            class="relative w-14 h-7 bg-[#BFFF00] rounded-full transition-colors duration-300"
+          >
+            <span id="toggle-circle" class="absolute top-0.5 right-0.5 w-6 h-6 bg-black rounded-full transition-all duration-300"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Citas pendientes -->
+      <div>
+        <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest mb-4">Citas pendientes</p>
+        <div id="appointments-list" class="space-y-3 max-h-64 overflow-y-auto">
+          <p class="font-['Space_Mono'] text-xs text-gray-600 text-center py-4">No hay citas pendientes</p>
+        </div>
+      </div>
+
+      <!-- Cerrar sesión -->
+      <button
+        id="logout-btn"
+        class="w-full border border-white/10 text-gray-500 py-3 text-xs font-['Space_Mono'] tracking-widest uppercase hover:border-red-500 hover:text-red-400 transition-colors"
+      >
+        Cerrar sesión
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ⚠️ Cambia esta contraseña por la que quieras
+  const ADMIN_PASSWORD = 'balcon2025';
+
+  const adminBtn = document.getElementById('admin-btn');
+  const modal = document.getElementById('admin-modal');
+  const closeModal = document.getElementById('close-modal');
+  const loginPanel = document.getElementById('login-panel');
+  const controlPanel = document.getElementById('control-panel');
+  const loginBtn = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
+  const logoutBtn = document.getElementById('logout-btn');
+  const statusToggle = document.getElementById('status-toggle');
+  const statusLabel = document.getElementById('status-label');
+  const toggleCircle = document.getElementById('toggle-circle');
+
+  let isOpen = localStorage.getItem('barber_status') !== 'closed';
+
+  // Abrir modal
+  adminBtn?.addEventListener('click', () => {
+    modal?.classList.remove('hidden');
+  });
+
+  // Cerrar modal
+  closeModal?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+  });
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.add('hidden');
+  });
+
+  // Login
+  loginBtn?.addEventListener('click', () => {
+    const input = (document.getElementById('admin-password') as HTMLInputElement)?.value;
+    if (input === ADMIN_PASSWORD) {
+      loginPanel?.classList.add('hidden');
+      controlPanel?.classList.remove('hidden');
+      loginError?.classList.add('hidden');
+      updateToggleUI();
+      loadAppointments();
+    } else {
+      loginError?.classList.remove('hidden');
+    }
+  });
+
+  // Enter en el input
+  document.getElementById('admin-password')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loginBtn?.click();
+  });
+
+  // Logout
+  logoutBtn?.addEventListener('click', () => {
+    controlPanel?.classList.add('hidden');
+    loginPanel?.classList.remove('hidden');
+    (document.getElementById('admin-password') as HTMLInputElement).value = '';
+    modal?.classList.add('hidden');
+  });
+
+  // Toggle estatus
+  function updateToggleUI() {
+    if (isOpen) {
+      statusToggle?.classList.add('bg-[#BFFF00]');
+      statusToggle?.classList.remove('bg-gray-700');
+      toggleCircle?.classList.add('right-0.5');
+      toggleCircle?.classList.remove('left-0.5');
+      if (statusLabel) statusLabel.textContent = 'ABIERTO';
+    } else {
+      statusToggle?.classList.remove('bg-[#BFFF00]');
+      statusToggle?.classList.add('bg-gray-700');
+      toggleCircle?.classList.remove('right-0.5');
+      toggleCircle?.classList.add('left-0.5');
+      if (statusLabel) statusLabel.textContent = 'CERRADO';
+    }
+  }
+
+  statusToggle?.addEventListener('click', () => {
+    isOpen = !isOpen;
+    const newStatus = isOpen ? 'open' : 'closed';
+    localStorage.setItem('barber_status', newStatus);
+    updateToggleUI();
+    window.dispatchEvent(new CustomEvent('statusChanged', { detail: { status: newStatus } }));
+  });
+
+  // Cargar citas desde localStorage
+  function loadAppointments() {
+    const list = document.getElementById('appointments-list');
+    const appointments = JSON.parse(localStorage.getItem('appointments') ?? '[]');
+
+    if (appointments.length === 0) {
+      if (list) list.innerHTML = '<p class="font-[\'Space_Mono\'] text-xs text-gray-600 text-center py-4">No hay citas pendientes</p>';
+      return;
+    }
+
+    if (list) {
+      list.innerHTML = appointments.map((apt: any, i: number) => `
+        <div class="bg-[#0A0A0A] border border-white/10 p-4 space-y-2" id="apt-${i}">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="font-['Bebas_Neue'] text-lg text-white">${apt.name}</p>
+              <p class="font-['Space_Mono'] text-xs text-gray-500">${apt.service} · ${apt.date} · ${apt.time}</p>
+              <p class="font-['Space_Mono'] text-xs text-gray-600">${apt.phone}</p>
+            </div>
+            <span class="font-['Space_Mono'] text-xs px-2 py-1 ${
+              apt.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' :
+              apt.status === 'accepted' ? 'bg-[#BFFF00]/10 text-[#BFFF00] border border-[#BFFF00]/30' :
+              'bg-red-500/10 text-red-400 border border-red-500/30'
+            }">${
+              apt.status === 'pending' ? 'PENDIENTE' :
+              apt.status === 'accepted' ? 'ACEPTADA' : 'RECHAZADA'
+            }</span>
+          </div>
+          ${apt.status === 'pending' ? `
+          <div class="flex gap-2 pt-1">
+            <button onclick="updateAppointment(${i}, 'accepted')" class="flex-1 bg-[#BFFF00]/10 border border-[#BFFF00]/30 text-[#BFFF00] font-['Space_Mono'] text-xs py-2 tracking-widest uppercase hover:bg-[#BFFF00]/20 transition-colors">
+              ✓ Aceptar
+            </button>
+            <button onclick="updateAppointment(${i}, 'rejected')" class="flex-1 bg-red-500/10 border border-red-500/30 text-red-400 font-['Space_Mono'] text-xs py-2 tracking-widest uppercase hover:bg-red-500/20 transition-colors">
+              ✕ Rechazar
+            </button>
+          </div>` : ''}
+        </div>
+      `).join('');
+    }
+  }
+
+  // Aceptar o rechazar cita
+  (window as any).updateAppointment = (index: number, status: string) => {
+    const appointments = JSON.parse(localStorage.getItem('appointments') ?? '[]');
+    appointments[index].status = status;
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+    loadAppointments();
+  };
+</script>
