@@ -9,9 +9,9 @@
       <!-- Lado izquierdo: info -->
       <div class="space-y-8">
         <div>
-          <p class="font-['Space_Mono'] text-xs text-[#F5C518] tracking-widest uppercase mb-3">— Agenda tu turno</p>
+          <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase mb-3">— Agenda tu turno</p>
           <h2 class="font-['Bebas_Neue'] text-6xl md:text-7xl text-white leading-none">
-            RESERVA<br /><span class="text-[#F5C518]">TU CITA</span>
+            RESERVA<br /><span class="text-[#BFFF00]">TU CITA</span>
           </h2>
         </div>
 
@@ -23,13 +23,13 @@
         <div class="space-y-2">
           <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest mb-4">Horarios de atención</p>
           {[
-            { days: 'Lunes — Viernes', hours: '9:00 AM – 8:00 PM' },
-            { days: 'Sábado', hours: '9:00 AM – 7:00 PM' },
-            { days: 'Domingo', hours: '10:00 AM – 4:00 PM' },
+            { days: 'Lunes — Viernes', hours: '10:00 AM – 8:00 PM' },
+            { days: 'Sábado', hours: '10:00 AM – 8:00 PM' },
+            { days: 'Domingo', hours: '12:00 PM – 7:00 PM' },
           ].map(h => (
             <div class="flex justify-between items-center py-3 border-b border-white/10">
               <span class="text-sm text-white">{h.days}</span>
-              <span class="font-['Space_Mono'] text-xs text-[#F5C518] tracking-widest">{h.hours}</span>
+              <span class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest">{h.hours}</span>
             </div>
           ))}
         </div>
@@ -37,12 +37,12 @@
         <!-- Contacto alternativo -->
         <div class="bg-[#111] border border-white/10 p-6 space-y-3">
           <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest mb-2">También puedes reservar por</p>
-          <a href="https://wa.me/5215512345678" target="_blank"
-            class="flex items-center gap-3 text-white hover:text-[#F5C518] transition-colors text-sm">
+          <a href="https://wa.me/5215517372164" target="_blank"
+            class="flex items-center gap-3 text-white hover:text-[#BFFF00] transition-colors text-sm">
             📱 WhatsApp: +52 55 7370 2164
           </a>
-          <a href="tel:+5215512345678"
-            class="flex items-center gap-3 text-white hover:text-[#F5C518] transition-colors text-sm">
+          <a href="tel:+5215517372164"
+            class="flex items-center gap-3 text-white hover:text-[#BFFF00] transition-colors text-sm">
             📞 Llamada: +52 55 7370 2164
           </a>
         </div>
@@ -55,37 +55,51 @@
         <!-- Nombre -->
         <div class="space-y-1">
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Nombre completo</label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Tu nombre"
-            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#F5C518] transition-colors placeholder-gray-700"
+          <input type="text" id="name" placeholder="Tu nombre"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors placeholder-gray-700"
           />
         </div>
 
         <!-- Teléfono -->
         <div class="space-y-1">
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Teléfono</label>
-          <input
-            type="tel"
-            id="phone"
-            placeholder="+52 55 0000 0000"
-            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#F5C518] transition-colors placeholder-gray-700"
+          <input type="tel" id="phone" placeholder="+52 55 0000 0000"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors placeholder-gray-700"
           />
+        </div>
+
+        <!-- Email -->
+        <div class="space-y-1">
+          <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Correo electrónico</label>
+          <input type="email" id="email" placeholder="tu@correo.com"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors placeholder-gray-700"
+          />
+        </div>
+        
+        <!-- Número de personas -->
+        <div class="space-y-1">
+          <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">¿Para cuántas personas?</label>
+          <select id="persons"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors cursor-pointer"
+          >
+            <option value="1">1 persona</option>
+            <option value="2">2 personas</option>
+          </select>
         </div>
 
         <!-- Servicio -->
         <div class="space-y-1">
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Servicio</label>
-          <select
-            id="service"
-            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#F5C518] transition-colors cursor-pointer"
+          <select id="service"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors cursor-pointer"
           >
             <option value="" disabled selected>Selecciona un servicio</option>
-            <option value="corte">Corte Clásico — $120</option>
-            <option value="afeitado">Corte Fade — $140</option>
-            <option value="combo">Arreglo de Barba — $100</option>
-            <option value="color">Cejas $40</option>
+            <option value="corte_clasico">Corte Clásico — $120</option>
+            <option value="corte_fade">Corte Fade — $140</option>
+            <option value="corte_fade_barba">Corte Fade + Barba — $240</option>
+            <option value="corte_clasico_barba">Corte Clásico + Barba — $220</option>
+            <option value="barba">Arreglo de Barba — $100</option>
+            <option value="cejascorte">Cejas — $40</option>
           </select>
         </div>
 
@@ -93,34 +107,37 @@
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
             <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Fecha</label>
-            <input
-              type="date"
-              id="date"
-              class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#F5C518] transition-colors [color-scheme:dark]"
+            <input type="date" id="date"
+              class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors [color-scheme:dark]"
             />
           </div>
           <div class="space-y-1">
             <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Hora</label>
-            <select
-              id="time"
-              class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#F5C518] transition-colors cursor-pointer"
+            <select id="time"
+              class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors cursor-pointer"
             >
               <option value="" disabled selected>Hora</option>
-              {['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'].map(t => (
+              {['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'].map(t => (
                 <option value={t}>{t} hrs</option>
               ))}
             </select>
           </div>
         </div>
 
+        <!-- Productos opcionales — dinámico desde Supabase -->
+        <div class="space-y-2">
+          <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Productos opcionales</label>
+          <p class="font-['Space_Mono'] text-xs text-gray-700">Agrega un producto a tu cita (opcional)</p>
+          <div id="products-grid" class="grid grid-cols-2 gap-3">
+            <p class="col-span-2 font-['Space_Mono'] text-xs text-gray-600 text-center py-4">Cargando productos...</p>
+          </div>
+        </div>
+
         <!-- Notas -->
         <div class="space-y-1">
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Notas adicionales</label>
-          <textarea
-            id="notes"
-            rows="3"
-            placeholder="¿Algo específico que debamos saber?"
-            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#F5C518] transition-colors placeholder-gray-700 resize-none"
+          <textarea id="notes" rows="3" placeholder="¿Algo específico que debamos saber?"
+            class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors placeholder-gray-700 resize-none"
           ></textarea>
         </div>
 
@@ -132,17 +149,15 @@
         </div>
 
         <!-- Botón -->
-        <button
-          id="submit-btn"
-          type="button"
-          class="w-full bg-[#F5C518] text-black font-bold py-4 text-sm tracking-widest uppercase hover:bg-[#FF6B1A] transition-colors duration-300"
+        <button id="submit-btn" type="button"
+          class="w-full bg-[#BFFF00] text-black font-bold py-4 text-sm tracking-widest uppercase hover:bg-[#BFFF00]/80 transition-colors"
         >
           Confirmar Reserva →
         </button>
 
         <!-- Mensaje éxito -->
         <div id="success-msg" class="hidden text-center py-4">
-          <p class="font-['Bebas_Neue'] text-2xl text-[#F5C518] mb-1">¡RESERVA ENVIADA!</p>
+          <p class="font-['Bebas_Neue'] text-2xl text-[#BFFF00] mb-1">¡RESERVA ENVIADA!</p>
           <p class="font-['Space_Mono'] text-xs text-gray-500">Te contactaremos para confirmar tu cita.</p>
         </div>
 
@@ -152,17 +167,64 @@
 </section>
 
 <script>
+  import emailjs from '@emailjs/browser';
+  import { supabase } from '../lib/supabase';
+
+  const SERVICE_ID = 'service_nfn5u5n';
+  const TEMPLATE_ID = 'template_4v2a2yh';
+  const PUBLIC_KEY = 'Nx4lOSt5UZixEHNfh';
+
+  emailjs.init(PUBLIC_KEY);
+
   const btn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-msg');
 
-  // Verificar estatus al cargar
+  // Cargar productos desde Supabase
+  async function loadProducts() {
+    const { data: products, error } = await supabase
+      .from('productos')
+      .select('*')
+      .order('id');
+
+    if (error || !products) return;
+
+    const grid = document.getElementById('products-grid')!;
+    grid.innerHTML = products.map(p => `
+      <label class="relative cursor-pointer">
+        <input
+          type="checkbox"
+          id="product-${p.id}"
+          value="${p.name}"
+          data-price="${p.price}"
+          ${p.stock === 0 ? 'disabled' : ''}
+          class="peer hidden"
+        />
+        <div class="border p-3 transition-all duration-300 ${
+          p.stock === 0
+            ? 'border-white/5 opacity-50 cursor-not-allowed'
+            : 'border-white/10 cursor-pointer peer-checked:border-[#BFFF00] peer-checked:bg-[#BFFF00]/5'
+        }">
+          <img src="${p.image}" alt="${p.name}" class="w-full h-24 object-cover mb-2" />
+          <p class="font-['Space_Mono'] text-xs text-white">${p.name}</p>
+          <div class="flex items-center justify-between mt-1">
+            <p class="font-['Bebas_Neue'] text-lg text-[#BFFF00]">$${p.price}</p>
+            ${p.stock === 0
+              ? '<span class="font-mono text-xs text-red-400">AGOTADO</span>'
+              : `<span class="font-mono text-xs text-gray-600">${p.stock} pzs</span>`
+            }
+          </div>
+        </div>
+      </label>
+    `).join('');
+  }
+
+  loadProducts();
+
+  // Estatus abierto/cerrado
   function checkStatus() {
     const status = localStorage.getItem('barber_status') ?? 'open';
-    if (status === 'closed') {
-      blockForm();
-    } else {
-      unblockForm();
-    }
+    if (status === 'closed') blockForm();
+    else unblockForm();
   }
 
   function blockForm() {
@@ -170,11 +232,7 @@
     (btn as HTMLButtonElement).disabled = true;
     btn.textContent = '🔒 Reservas no disponibles';
     btn.classList.add('opacity-50', 'cursor-not-allowed');
-    btn.classList.remove('hover:bg-[#BFFF00]/80');
-
-    // Mostrar aviso
-    const warning = document.getElementById('closed-warning');
-    warning?.classList.remove('hidden');
+    document.getElementById('closed-warning')?.classList.remove('hidden');
   }
 
   function unblockForm() {
@@ -182,39 +240,39 @@
     (btn as HTMLButtonElement).disabled = false;
     btn.textContent = 'Confirmar Reserva →';
     btn.classList.remove('opacity-50', 'cursor-not-allowed');
-    btn.classList.add('hover:bg-[#BFFF00]/80');
-
-    const warning = document.getElementById('closed-warning');
-    warning?.classList.add('hidden');
+    document.getElementById('closed-warning')?.classList.add('hidden');
   }
 
   checkStatus();
 
-  // Escuchar cambios de estatus en tiempo real
   window.addEventListener('storage', (e) => {
     if (e.key === 'barber_status') checkStatus();
   });
 
   window.addEventListener('statusChanged', (e: any) => {
-    if (e.detail.status === 'closed') {
-      blockForm();
-    } else {
-      unblockForm();
-    }
+    if (e.detail.status === 'closed') blockForm();
+    else unblockForm();
   });
 
-  btn?.addEventListener('click', () => {
+  btn?.addEventListener('click', async () => {
     const status = localStorage.getItem('barber_status') ?? 'open';
     if (status === 'closed') return;
 
     const name = (document.getElementById('name') as HTMLInputElement)?.value.trim();
     const phone = (document.getElementById('phone') as HTMLInputElement)?.value.trim();
+    const email = (document.getElementById('email') as HTMLInputElement)?.value.trim();
     const service = (document.getElementById('service') as HTMLSelectElement)?.value;
     const date = (document.getElementById('date') as HTMLInputElement)?.value;
     const time = (document.getElementById('time') as HTMLSelectElement)?.value;
     const notes = (document.getElementById('notes') as HTMLTextAreaElement)?.value.trim();
+    const persons = (document.getElementById('persons') as HTMLSelectElement)?.value;
 
-    if (!name || !phone || !service || !date || !time) {
+    // Capturar productos seleccionados dinámicamente
+    const selectedProducts = Array.from(
+      document.querySelectorAll('[id^="product-"]:checked')
+    ).map((el: any) => `${el.value} ($${el.dataset.price})`).join(', ') || 'Ninguno';
+
+    if (!name || !phone || !email || !service || !date || !time) {
       alert('Por favor completa todos los campos requeridos.');
       return;
     }
@@ -231,31 +289,53 @@
       return;
     }
 
-    // Verificar hora ocupada
-    const appointments = JSON.parse(localStorage.getItem('appointments') ?? '[]');
-    const conflict = appointments.some(
-      (a: any) => a.date === date && a.time === time && a.status !== 'rejected'
-    );
+    // Verificar hora ocupada en Supabase
+    const { data: existing } = await supabase
+      .from('appointments')
+      .select('id')
+      .eq('date', date)
+      .eq('time', time)
+      .neq('status', 'rejected');
 
-    if (conflict) {
+    if (existing && existing.length > 0) {
       alert('⚠️ Ese horario ya está reservado. Por favor elige otra hora.');
       return;
     }
 
-    // Guardar cita
-    appointments.push({
-      name, phone, service, date, time, notes,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    });
-    localStorage.setItem('appointments', JSON.stringify(appointments));
-
-    (btn as HTMLButtonElement).textContent = 'Enviando...';
     (btn as HTMLButtonElement).disabled = true;
+    btn.textContent = 'Enviando...';
 
-    setTimeout(() => {
-      btn?.classList.add('hidden');
-      successMsg?.classList.remove('hidden');
-    }, 1200);
+    try {
+      // Guardar en Supabase
+      const { error } = await supabase.from('appointments').insert({
+        name, phone, email, service, date, time,
+        persons: parseInt(persons),
+        notes: notes || null,
+        products: selectedProducts,
+        status: 'pending',
+      });
+
+      if (error) throw error;
+
+      // Enviar email al dueño
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+        client_name: name,
+        client_phone: phone,
+        service, date, time, persons,
+        notes: notes || 'Sin notas',
+        products: selectedProducts,
+      });
+
+      setTimeout(() => {
+        btn?.classList.add('hidden');
+        successMsg?.classList.remove('hidden');
+      }, 500);
+
+    } catch (error) {
+      console.error('Error completo:', JSON.stringify(error));
+      alert('⚠️ Hubo un error al enviar la reserva. Intenta de nuevo.');
+      (btn as HTMLButtonElement).disabled = false;
+      btn.textContent = 'Confirmar Reserva →';
+    }
   });
 </script>

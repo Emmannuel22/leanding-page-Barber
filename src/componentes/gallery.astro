@@ -1,14 +1,17 @@
 ---
 const works = [
-  { id: 1, title: 'Fade Skin', tag: 'Corte' },
-  { id: 2, title: 'Beard Trim', tag: 'Barba' },
-  { id: 3, title: 'Crew Cut', tag: 'Corte' },
-  { id: 4, title: 'Drop Fade', tag: 'Fade' },
-  { id: 5, title: 'Full Combo', tag: 'Combo' },
-  { id: 6, title: 'Mid Fade', tag: 'Fade' },
+  { id: 1, title: 'Corte Clásico', tag: 'Clásico' },
+  { id: 2, title: 'Corte Clásico', tag: 'Clásico' },
+  { id: 3, title: 'Corte Fade', tag: 'Fade' },
+  { id: 4, title: 'Corte Fade', tag: 'Fade' },
+  { id: 5, title: 'Arreglo de Barba', tag: 'Barba' },
+  { id: 6, title: 'Arreglo de Barba', tag: 'Barba' },
+  { id: 7, title: 'Cejas', tag: 'Cejas' },
+  { id: 8, title: 'Corte + Barba', tag: 'Combo' },
+  { id: 9, title: 'Fade + Barba', tag: 'Combo' },
 ];
 
-const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
+const tags = ['Todos', 'Clásico', 'Fade', 'Barba', 'Cejas', 'Combo'];
 ---
 
 <section id="galeria" class="py-24 bg-[#111]">
@@ -16,7 +19,7 @@ const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
 
     <!-- Header -->
     <div class="mb-16">
-      <p class="font-['Space_Mono'] text-xs text-[#F5C518] tracking-widest uppercase mb-3">— Nuestro trabajo</p>
+      <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase mb-3">— Nuestro trabajo</p>
       <h2 class="font-['Bebas_Neue'] text-6xl md:text-7xl text-white leading-none">
         GALERÍA
       </h2>
@@ -29,8 +32,8 @@ const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
           data-filter={tag}
           class={`gallery-filter font-['Space_Mono'] text-xs tracking-widest uppercase px-4 py-2 border transition-all duration-300 ${
             i === 0
-              ? 'bg-[#F5C518] text-black border-[#F5C518]'
-              : 'text-gray-500 border-white/20 hover:border-[#F5C518] hover:text-[#F5C518]'
+              ? 'bg-[#BFFF00] text-black border-[#BFFF00]'
+              : 'text-gray-500 border-white/20 hover:border-[#BFFF00] hover:text-[#BFFF00]'
           }`}
         >
           {tag}
@@ -45,7 +48,7 @@ const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
           data-tag={work.tag}
           class="gallery-item group relative aspect-square bg-[#1A1A1A] border border-white/10 overflow-hidden cursor-pointer"
         >
-          <!-- Placeholder — reemplaza con tus fotos reales -->
+          <!-- Placeholder -->
           <div class="w-full h-full flex items-center justify-center">
             <div class="text-center">
               <div class="text-4xl mb-2">📸</div>
@@ -55,12 +58,12 @@ const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
 
           <!-- Overlay hover -->
           <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2">
-            <span class="font-['Space_Mono'] text-xs text-[#F5C518] tracking-widest uppercase">{work.tag}</span>
+            <span class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase">{work.tag}</span>
             <span class="font-['Bebas_Neue'] text-2xl text-white tracking-wide">{work.title}</span>
           </div>
 
           <!-- Número -->
-          <div class="absolute top-3 left-3 font-['Space_Mono'] text-xs text-gray-600 group-hover:text-[#F5C518] transition-colors duration-300">
+          <div class="absolute top-3 left-3 font-['Space_Mono'] text-xs text-gray-600 group-hover:text-[#BFFF00] transition-colors duration-300">
             {String(i + 1).padStart(2, '0')}
           </div>
         </div>
@@ -74,19 +77,22 @@ const tags = ['Todos', 'Corte', 'Barba', 'Fade', 'Combo'];
   const filterBtns = document.querySelectorAll('.gallery-filter');
   const items = document.querySelectorAll('.gallery-item');
 
+  // Activar botón "Todos" por default
+  function setActiveBtn(activeBtn: Element) {
+    filterBtns.forEach(b => {
+      b.classList.remove('bg-[#BFFF00]', 'text-black', 'border-[#BFFF00]');
+      b.classList.add('text-gray-500', 'border-white/20');
+    });
+    activeBtn.classList.remove('text-gray-500', 'border-white/20');
+    activeBtn.classList.add('bg-[#BFFF00]', 'text-black', 'border-[#BFFF00]');
+  }
+
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const filter = btn.getAttribute('data-filter');
 
-      // Actualizar botones
-      filterBtns.forEach(b => {
-        b.classList.remove('bg-[#F5C518]', 'text-black', 'border-[#F5C518]');
-        b.classList.add('text-gray-500', 'border-white/20');
-      });
-      btn.classList.add('bg-[#F5C518]', 'text-black', 'border-[#F5C518]');
-      btn.classList.remove('text-gray-500', 'border-white/20');
+      setActiveBtn(btn);
 
-      // Filtrar
       items.forEach(item => {
         if (filter === 'Todos' || item.getAttribute('data-tag') === filter) {
           (item as HTMLElement).style.display = 'block';
