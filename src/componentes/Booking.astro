@@ -168,54 +168,53 @@
 
 <script>
   import emailjs from '@emailjs/browser';
-  import { supabase } from '../lib/supabase';
 
+  const PUBLIC_KEY = 'Nx4lOSt5UZixEHNfh';
   const SERVICE_ID = 'service_nfn5u5n';
   const TEMPLATE_ID = 'template_4v2a2yh';
-  const PUBLIC_KEY = 'Nx4lOSt5UZixEHNfh';
 
   emailjs.init(PUBLIC_KEY);
 
   const btn = document.getElementById('submit-btn');
   const successMsg = document.getElementById('success-msg');
 
-  // Cargar productos desde Supabase
+  // Cargar productos desde API
   async function loadProducts() {
-    const { data: products, error } = await supabase
-      .from('productos')
-      .select('*')
-      .order('id');
+    try {
+      const res = await fetch('/api/products');
+      const products = await res.json();
 
-    if (error || !products) return;
-
-    const grid = document.getElementById('products-grid')!;
-    grid.innerHTML = products.map(p => `
-      <label class="relative cursor-pointer">
-        <input
-          type="checkbox"
-          id="product-${p.id}"
-          value="${p.name}"
-          data-price="${p.price}"
-          ${p.stock === 0 ? 'disabled' : ''}
-          class="peer hidden"
-        />
-        <div class="border p-3 transition-all duration-300 ${
-          p.stock === 0
-            ? 'border-white/5 opacity-50 cursor-not-allowed'
-            : 'border-white/10 cursor-pointer peer-checked:border-[#BFFF00] peer-checked:bg-[#BFFF00]/5'
-        }">
-          <img src="${p.image}" alt="${p.name}" class="w-full h-24 object-cover mb-2" />
-          <p class="font-['Space_Mono'] text-xs text-white">${p.name}</p>
-          <div class="flex items-center justify-between mt-1">
-            <p class="font-['Bebas_Neue'] text-lg text-[#BFFF00]">$${p.price}</p>
-            ${p.stock === 0
-              ? '<span class="font-mono text-xs text-red-400">AGOTADO</span>'
-              : `<span class="font-mono text-xs text-gray-600">${p.stock} pzs</span>`
-            }
+      const grid = document.getElementById('products-grid')!;
+      grid.innerHTML = products.map((p: any) => `
+        <label class="relative cursor-pointer">
+          <input
+            type="checkbox"
+            id="product-${p.id}"
+            value="${p.name}"
+            data-price="${p.price}"
+            ${p.stock === 0 ? 'disabled' : ''}
+            class="peer hidden"
+          />
+          <div class="border p-3 transition-all duration-300 ${
+            p.stock === 0
+              ? 'border-white/5 opacity-50 cursor-not-allowed'
+              : 'border-white/10 cursor-pointer peer-checked:border-[#BFFF00] peer-checked:bg-[#BFFF00]/5'
+          }">
+            <img src="${p.image}" alt="${p.name}" class="w-full h-24 object-cover mb-2" />
+            <p class="font-['Space_Mono'] text-xs text-white">${p.name}</p>
+            <div class="flex items-center justify-between mt-1">
+              <p class="font-['Bebas_Neue'] text-lg text-[#BFFF00]">$${p.price}</p>
+              ${p.stock === 0
+                ? '<span class="font-mono text-xs text-red-400">AGOTADO</span>'
+                : `<span class="font-mono text-xs text-gray-600">${p.stock} pzs</span>`
+              }
+            </div>
           </div>
-        </div>
-      </label>
-    `).join('');
+        </label>
+      `).join('');
+    } catch (error) {
+      console.error('Error cargando productos:', error);
+    }
   }
 
   loadProducts();
@@ -267,7 +266,6 @@
     const notes = (document.getElementById('notes') as HTMLTextAreaElement)?.value.trim();
     const persons = (document.getElementById('persons') as HTMLSelectElement)?.value;
 
-    // Capturar productos seleccionados dinámicamente
     const selectedProducts = Array.from(
       document.querySelectorAll('[id^="product-"]:checked')
     ).map((el: any) => `${el.value} ($${el.dataset.price})`).join(', ') || 'Ninguno';
@@ -289,39 +287,37 @@
       return;
     }
 
-    // Verificar hora ocupada en Supabase
-    const { data: existing } = await supabase
-      .from('appointments')
-      .select('id')
-      .eq('date', date)
-      .eq('time', time)
-      .neq('status', 'rejected');
-
-    if (existing && existing.length > 0) {
-      alert('⚠️ Ese horario ya está reservado. Por favor elige otra hora.');
-      return;
-    }
-
     (btn as HTMLButtonElement).disabled = true;
     btn.textContent = 'Enviando...';
 
     try {
-      // Guardar en Supabase
-      const { error } = await supabase.from('appointments').insert({
-        name, phone, email, service, date, time,
-        persons: parseInt(persons),
-        notes: notes || null,
-        products: selectedProducts,
-        status: 'pending',
+      // Guardar cita via API
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name, phone, email, service, date, time,
+          notes: notes || null,
+          products: selectedProducts,
+          persons: parseInt(persons),
+        }),
       });
 
-      if (error) throw error;
+      if (res.status === 409) {
+        alert('⚠️ Ese horario ya está reservado. Por favor elige otra hora.');
+        (btn as HTMLButtonElement).disabled = false;
+        btn.textContent = 'Confirmar Reserva →';
+        return;
+      }
+
+      if (!res.ok) throw new Error('Error al guardar la cita');
 
       // Enviar email al dueño
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
         client_name: name,
         client_phone: phone,
-        service, date, time, persons,
+        service, date, time,
+        persons,
         notes: notes || 'Sin notas',
         products: selectedProducts,
       });
@@ -332,7 +328,7 @@
       }, 500);
 
     } catch (error) {
-      console.error('Error completo:', JSON.stringify(error));
+      console.error('Error:', error);
       alert('⚠️ Hubo un error al enviar la reserva. Intenta de nuevo.');
       (btn as HTMLButtonElement).disabled = false;
       btn.textContent = 'Confirmar Reserva →';

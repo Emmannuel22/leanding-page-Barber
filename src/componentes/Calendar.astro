@@ -80,29 +80,29 @@
 </section>
 
 <script>
-  import { supabase } from '../lib/supabase';  
-
-  const HOURS = ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+  const HOURS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'];
   const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
   let currentDate = new Date();
   let selectedDay: string | null = null;
   let busyData: Record<string, string[]> = {};
 
-  // Cargar todas las citas desde Supabase
+  // Cargar citas desde API en vez de Supabase directo
   async function loadBusySlots() {
-    const { data, error } = await supabase
-      .from('appointments')
-      .select('date, time')
-      .neq('status', 'rejected');
+    try {
+      const res = await fetch('/api/appointments');
+      const data = await res.json();
 
-    if (error || !data) return;
-
-    busyData = {};
-    data.forEach((apt: any) => {
-      if (!busyData[apt.date]) busyData[apt.date] = [];
-      busyData[apt.date].push(apt.time);
-    });
+      busyData = {};
+      data
+        .filter((apt: any) => apt.status !== 'rejected')
+        .forEach((apt: any) => {
+          if (!busyData[apt.date]) busyData[apt.date] = [];
+          busyData[apt.date].push(apt.time);
+        });
+    } catch (error) {
+      console.error('Error cargando disponibilidad:', error);
+    }
   }
 
   function getBusyHours(dateStr: string): string[] {
@@ -150,10 +150,8 @@
       } else if (isSelected) {
         classes += 'bg-[#BFFF00] text-black font-bold';
       } else if (isBusy) {
-        // Verde = tiene al menos una cita (ocupado parcialmente)
         classes += 'bg-[#BFFF00]/20 text-[#BFFF00] border border-[#BFFF00]/40 hover:bg-[#BFFF00]/30';
       } else {
-        // Negro/oscuro = completamente libre
         classes += 'text-white hover:bg-white/10 border border-white/10';
       }
 
@@ -221,7 +219,6 @@
     document.getElementById('reserve-cta')!.classList.add('hidden');
   }
 
-  // Inicializar
   async function init() {
     await loadBusySlots();
     renderCalendar();

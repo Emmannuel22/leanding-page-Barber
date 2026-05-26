@@ -90,17 +90,6 @@
 </div>
 
 <script>
-  import emailjs from '@emailjs/browser';
-  import { supabase } from '../lib/supabase';
-
-  const SERVICE_ID = 'service_nfn5u5n';
-  const TEMPLATE_CLIENT_ID = 'template_tafdu8b';
-  const PUBLIC_KEY = 'Nx4lOSt5UZixEHNfh';
-
-  emailjs.init(PUBLIC_KEY);
-
-  const ADMIN_PASSWORD = 'balcon2025';
-
   const adminBtn = document.getElementById('admin-btn');
   const modal = document.getElementById('admin-modal');
   const closeModal = document.getElementById('close-modal');
@@ -116,7 +105,6 @@
   let isOpen = localStorage.getItem('barber_status') !== 'closed';
   let selectedDay = getTodayStr();
   let pollingInterval: any = null;
-  let realtimeChannel: any = null;
 
   function getTodayStr() {
     const now = new Date();
@@ -156,32 +144,24 @@
     if (e.target === modal) modal.classList.add('hidden');
   });
 
-  // Login
-  loginBtn?.addEventListener('click', () => {
+  // Login — solo manda la contraseña una vez
+  loginBtn?.addEventListener('click', async () => {
     const input = (document.getElementById('admin-password') as HTMLInputElement)?.value;
-    if (input === ADMIN_PASSWORD) {
+
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: input }),
+    });
+
+    if (res.ok) {
       loginPanel?.classList.add('hidden');
       controlPanel?.classList.remove('hidden');
       loginError?.classList.add('hidden');
       updateToggleUI();
       loadProducts();
       loadAppointments();
-
-      pollingInterval = setInterval(() => {
-        loadAppointments();
-      }, 30000);
-
-      realtimeChannel = supabase
-        .channel('appointments-changes')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'appointments'
-        }, () => {
-          loadAppointments();
-        })
-        .subscribe();
-
+      pollingInterval = setInterval(() => loadAppointments(), 30000);
     } else {
       loginError?.classList.remove('hidden');
     }
@@ -191,14 +171,14 @@
     if (e.key === 'Enter') loginBtn?.click();
   });
 
-  // Logout
-  logoutBtn?.addEventListener('click', () => {
+  // Logout — elimina la cookie de sesión
+  logoutBtn?.addEventListener('click', async () => {
+    await fetch('/api/auth', { method: 'DELETE' });
     controlPanel?.classList.add('hidden');
     loginPanel?.classList.remove('hidden');
     (document.getElementById('admin-password') as HTMLInputElement).value = '';
     modal?.classList.add('hidden');
     if (pollingInterval) clearInterval(pollingInterval);
-    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
   });
 
   // Toggle estatus
@@ -226,201 +206,173 @@
     window.dispatchEvent(new CustomEvent('statusChanged', { detail: { status: newStatus } }));
   });
 
-  // Cargar y mostrar productos con control de stock
+  // Cargar productos desde API
   async function loadProducts() {
-    const { data: products, error } = await supabase
-      .from('productos')
-      .select('*')
-      .order('id');
+    try {
+      const res = await fetch('/api/products');
+      const products = await res.json();
 
-    if (error || !products) return;
-
-    const stockEl = document.getElementById('products-stock')!;
-    stockEl.innerHTML = products.map((p: any) => `
-      <div class="flex items-center justify-between py-3 border-b border-white/10">
-        <div class="flex items-center gap-3">
-          <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-cover" />
-          <div>
-            <p class="font-['Space_Mono'] text-xs text-white">${p.name}</p>
-            <p class="font-['Space_Mono'] text-xs text-gray-600">$${p.price}</p>
+      const stockEl = document.getElementById('products-stock')!;
+      stockEl.innerHTML = products.map((p: any) => `
+        <div class="flex items-center justify-between py-3 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-cover" />
+            <div>
+              <p class="font-['Space_Mono'] text-xs text-white">${p.name}</p>
+              <p class="font-['Space_Mono'] text-xs text-gray-600">$${p.price}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              onclick="updateStock(${p.id}, ${p.stock - 1})"
+              class="w-7 h-7 border border-white/10 text-white hover:border-red-400 hover:text-red-400 transition-colors flex items-center justify-center font-bold"
+              ${p.stock === 0 ? 'disabled' : ''}
+            >−</button>
+            <span class="font-['Bebas_Neue'] text-xl w-8 text-center ${p.stock === 0 ? 'text-red-400' : 'text-[#BFFF00]'}">${p.stock}</span>
+            <button
+              onclick="updateStock(${p.id}, ${p.stock + 1})"
+              class="w-7 h-7 border border-white/10 text-white hover:border-[#BFFF00] hover:text-[#BFFF00] transition-colors flex items-center justify-center font-bold"
+            >+</button>
+            <span class="font-['Space_Mono'] text-xs ml-2 ${p.stock === 0 ? 'text-red-400' : 'text-gray-600'}">
+              ${p.stock === 0 ? 'AGOTADO' : 'pzs'}
+            </span>
           </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button
-            onclick="updateStock(${p.id}, ${p.stock - 1})"
-            class="w-7 h-7 border border-white/10 text-white hover:border-red-400 hover:text-red-400 transition-colors flex items-center justify-center font-bold"
-            ${p.stock === 0 ? 'disabled' : ''}
-          >−</button>
-          <span class="font-['Bebas_Neue'] text-xl w-8 text-center ${p.stock === 0 ? 'text-red-400' : 'text-[#BFFF00]'}">${p.stock}</span>
-          <button
-            onclick="updateStock(${p.id}, ${p.stock + 1})"
-            class="w-7 h-7 border border-white/10 text-white hover:border-[#BFFF00] hover:text-[#BFFF00] transition-colors flex items-center justify-center font-bold"
-          >+</button>
-          <span class="font-['Space_Mono'] text-xs ml-2 ${p.stock === 0 ? 'text-red-400' : 'text-gray-600'}">
-            ${p.stock === 0 ? 'AGOTADO' : 'pzs'}
-          </span>
-        </div>
-      </div>
-    `).join('');
+      `).join('');
+    } catch (error) {
+      console.error('Error cargando productos:', error);
+    }
   }
 
-  // Actualizar stock
+  // Actualizar stock — sin contraseña, usa cookie
   (window as any).updateStock = async (id: number, newStock: number) => {
     if (newStock < 0) return;
-
-    const { error } = await supabase
-      .from('productos')
-      .update({ stock: newStock })
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error actualizando stock:', error);
-      return;
+    try {
+      const res = await fetch('/api/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, stock: newStock }),
+      });
+      if (!res.ok) throw new Error('Error actualizando stock');
+      loadProducts();
+    } catch (error) {
+      console.error('Error:', error);
     }
-
-    loadProducts();
   };
 
-  // Cargar citas desde Supabase
+  // Cargar citas desde API
   async function loadAppointments() {
-    const today = getTodayStr();
+    try {
+      const today = getTodayStr();
+      const res = await fetch(`/api/appointments?date=${today}`);
+      const appointments = await res.json();
 
-    const { data: appointments, error } = await supabase
-      .from('appointments')
-      .select('*')
-      .gte('date', today)
-      .order('date', { ascending: true })
-      .order('time', { ascending: true });
-
-    const lastUpdate = document.getElementById('last-update');
-    if (lastUpdate) {
-      const now = new Date();
-      lastUpdate.textContent = `Actualizado ${now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
-    }
-
-    if (error) {
-      console.error('Error cargando citas:', error);
-      return;
-    }
-
-    if (!appointments || appointments.length === 0) {
-      document.getElementById('day-tabs')!.innerHTML = '';
-      document.getElementById('day-content')!.innerHTML =
-        '<p class="font-[\'Space_Mono\'] text-xs text-gray-600 text-center py-8">No hay citas próximas</p>';
-      return;
-    }
-
-    const grouped: Record<string, any[]> = {};
-    appointments.forEach((apt: any) => {
-      if (!grouped[apt.date]) grouped[apt.date] = [];
-      grouped[apt.date].push(apt);
-    });
-
-    const sortedDays = Object.keys(grouped).sort();
-    if (!grouped[selectedDay]) selectedDay = sortedDays[0];
-
-    const tabsEl = document.getElementById('day-tabs')!;
-    tabsEl.innerHTML = sortedDays.map(day => {
-      const label = formatTabDate(day);
-      const isActive = day === selectedDay;
-      const pendingCount = grouped[day].filter((a: any) => a.status === 'pending').length;
-      return `
-        <button data-day="${day}" class="day-tab flex-shrink-0 flex flex-col items-center px-4 py-2 border transition-all duration-200 ${
-          isActive
-            ? 'border-[#BFFF00] bg-[#BFFF00]/10 text-[#BFFF00]'
-            : 'border-white/10 text-gray-500 hover:border-white/30 hover:text-white'
-        }">
-          <span class="font-['Bebas_Neue'] text-sm tracking-widest">${label.top}</span>
-          <span class="font-['Space_Mono'] text-xs">${label.bottom}</span>
-          ${pendingCount > 0 ? `<span class="mt-1 w-4 h-4 bg-yellow-400 text-black text-xs font-bold rounded-full flex items-center justify-center">${pendingCount}</span>` : ''}
-        </button>
-      `;
-    }).join('');
-
-    tabsEl.querySelectorAll('.day-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        selectedDay = tab.getAttribute('data-day')!;
-        loadAppointments();
-      });
-    });
-
-    const dayAppointments = grouped[selectedDay] ?? [];
-    const contentEl = document.getElementById('day-content')!;
-
-    contentEl.innerHTML = `
-      <p class="font-['Space_Mono'] text-xs text-gray-600 mb-3">${formatFullDate(selectedDay)}</p>
-      ${dayAppointments.length === 0
-        ? '<p class="font-[\'Space_Mono\'] text-xs text-gray-600 text-center py-4">Sin citas este día</p>'
-        : dayAppointments.map((apt: any) => `
-            <div class="bg-[#0A0A0A] border border-white/10 p-4 space-y-2 mb-3">
-              <div class="flex justify-between items-start">
-                <div class="space-y-1">
-                  <p class="font-['Bebas_Neue'] text-lg text-white">${apt.name}</p>
-                  <p class="font-['Space_Mono'] text-xs text-[#BFFF00]">⏰ ${apt.time} hrs</p>
-                  <p class="font-['Space_Mono'] text-xs text-gray-500">✂️ ${apt.service}</p>
-                  <p class="font-['Space_Mono'] text-xs text-gray-600">📞 ${apt.phone}</p>
-                  <p class="font-['Space_Mono'] text-xs text-gray-600">📧 ${apt.email ?? 'Sin correo'}</p>
-                  ${apt.products && apt.products !== 'Ninguno' ? `<p class="font-['Space_Mono'] text-xs text-[#BFFF00]/70">🛍️ ${apt.products}</p>` : ''}
-                  ${apt.notes ? `<p class="font-['Space_Mono'] text-xs text-gray-700">📝 ${apt.notes}</p>` : ''}
-                </div>
-                <span class="font-['Space_Mono'] text-xs px-2 py-1 ${
-                  apt.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' :
-                  apt.status === 'accepted' ? 'bg-[#BFFF00]/10 text-[#BFFF00] border border-[#BFFF00]/30' :
-                  'bg-red-500/10 text-red-400 border border-red-500/30'
-                }">${
-                  apt.status === 'pending' ? 'PENDIENTE' :
-                  apt.status === 'accepted' ? 'ACEPTADA' : 'RECHAZADA'
-                }</span>
-              </div>
-              ${apt.status === 'pending' ? `
-              <div class="flex gap-2 pt-1">
-                <button onclick="updateAppointment('${apt.id}', 'accepted')" class="flex-1 bg-[#BFFF00]/10 border border-[#BFFF00]/30 text-[#BFFF00] font-['Space_Mono'] text-xs py-2 tracking-widest uppercase hover:bg-[#BFFF00]/20 transition-colors">
-                  ✓ Aceptar
-                </button>
-                <button onclick="updateAppointment('${apt.id}', 'rejected')" class="flex-1 bg-red-500/10 border border-red-500/30 text-red-400 font-['Space_Mono'] text-xs py-2 tracking-widest uppercase hover:bg-red-500/20 transition-colors">
-                  ✕ Rechazar
-                </button>
-              </div>` : ''}
-            </div>
-          `).join('')
+      const lastUpdate = document.getElementById('last-update');
+      if (lastUpdate) {
+        const now = new Date();
+        lastUpdate.textContent = `Actualizado ${now.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`;
       }
-    `;
+
+      if (!appointments || appointments.length === 0) {
+        document.getElementById('day-tabs')!.innerHTML = '';
+        document.getElementById('day-content')!.innerHTML =
+          '<p class="font-[\'Space_Mono\'] text-xs text-gray-600 text-center py-8">No hay citas próximas</p>';
+        return;
+      }
+
+      const grouped: Record<string, any[]> = {};
+      appointments.forEach((apt: any) => {
+        if (!grouped[apt.date]) grouped[apt.date] = [];
+        grouped[apt.date].push(apt);
+      });
+
+      const sortedDays = Object.keys(grouped).sort();
+      if (!grouped[selectedDay]) selectedDay = sortedDays[0];
+
+      const tabsEl = document.getElementById('day-tabs')!;
+      tabsEl.innerHTML = sortedDays.map(day => {
+        const label = formatTabDate(day);
+        const isActive = day === selectedDay;
+        const pendingCount = grouped[day].filter((a: any) => a.status === 'pending').length;
+        return `
+          <button data-day="${day}" class="day-tab flex-shrink-0 flex flex-col items-center px-4 py-2 border transition-all duration-200 ${
+            isActive
+              ? 'border-[#BFFF00] bg-[#BFFF00]/10 text-[#BFFF00]'
+              : 'border-white/10 text-gray-500 hover:border-white/30 hover:text-white'
+          }">
+            <span class="font-['Bebas_Neue'] text-sm tracking-widest">${label.top}</span>
+            <span class="font-['Space_Mono'] text-xs">${label.bottom}</span>
+            ${pendingCount > 0 ? `<span class="mt-1 w-4 h-4 bg-yellow-400 text-black text-xs font-bold rounded-full flex items-center justify-center">${pendingCount}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+
+      tabsEl.querySelectorAll('.day-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          selectedDay = tab.getAttribute('data-day')!;
+          loadAppointments();
+        });
+      });
+
+      const dayAppointments = grouped[selectedDay] ?? [];
+      const contentEl = document.getElementById('day-content')!;
+
+      contentEl.innerHTML = `
+        <p class="font-['Space_Mono'] text-xs text-gray-600 mb-3">${formatFullDate(selectedDay)}</p>
+        ${dayAppointments.length === 0
+          ? '<p class="font-[\'Space_Mono\'] text-xs text-gray-600 text-center py-4">Sin citas este día</p>'
+          : dayAppointments.map((apt: any) => `
+              <div class="bg-[#0A0A0A] border border-white/10 p-4 space-y-2 mb-3">
+                <div class="flex justify-between items-start">
+                  <div class="space-y-1">
+                    <p class="font-['Bebas_Neue'] text-lg text-white">${apt.name}</p>
+                    <p class="font-['Space_Mono'] text-xs text-[#BFFF00]">⏰ ${apt.time} hrs</p>
+                    <p class="font-['Space_Mono'] text-xs text-gray-500">✂️ ${apt.service}</p>
+                    <p class="font-['Space_Mono'] text-xs text-gray-500">👥 ${apt.persons ?? 1} persona(s)</p>
+                    <p class="font-['Space_Mono'] text-xs text-gray-600">📞 ${apt.phone}</p>
+                    <p class="font-['Space_Mono'] text-xs text-gray-600">📧 ${apt.email ?? 'Sin correo'}</p>
+                    ${apt.products && apt.products !== 'Ninguno' ? `<p class="font-['Space_Mono'] text-xs text-[#BFFF00]/70">🛍️ ${apt.products}</p>` : ''}
+                    ${apt.notes ? `<p class="font-['Space_Mono'] text-xs text-gray-700">📝 ${apt.notes}</p>` : ''}
+                  </div>
+                  <span class="font-['Space_Mono'] text-xs px-2 py-1 ${
+                    apt.status === 'pending' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/30' :
+                    apt.status === 'accepted' ? 'bg-[#BFFF00]/10 text-[#BFFF00] border border-[#BFFF00]/30' :
+                    'bg-red-500/10 text-red-400 border border-red-500/30'
+                  }">${
+                    apt.status === 'pending' ? 'PENDIENTE' :
+                    apt.status === 'accepted' ? 'ACEPTADA' : 'RECHAZADA'
+                  }</span>
+                </div>
+                ${apt.status === 'pending' ? `
+                <div class="flex gap-2 pt-1">
+                  <button onclick="updateAppointment('${apt.id}', 'accepted')" class="flex-1 bg-[#BFFF00]/10 border border-[#BFFF00]/30 text-[#BFFF00] font-['Space_Mono'] text-xs py-2 tracking-widest uppercase hover:bg-[#BFFF00]/20 transition-colors">
+                    ✓ Aceptar
+                  </button>
+                  <button onclick="updateAppointment('${apt.id}', 'rejected')" class="flex-1 bg-red-500/10 border border-red-500/30 text-red-400 font-['Space_Mono'] text-xs py-2 tracking-widest uppercase hover:bg-red-500/20 transition-colors">
+                    ✕ Rechazar
+                  </button>
+                </div>` : ''}
+              </div>
+            `).join('')
+        }
+      `;
+    } catch (error) {
+      console.error('Error cargando citas:', error);
+    }
   }
 
-  // Aceptar o rechazar cita
+  // Aceptar o rechazar — sin contraseña, usa cookie
   (window as any).updateAppointment = async (id: string, status: string) => {
-    const { data: apt, error } = await supabase
-      .from('appointments')
-      .update({ status })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error actualizando cita:', error);
-      return;
+    try {
+      const res = await fetch('/api/appointments', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) throw new Error('Error actualizando cita');
+      loadAppointments();
+    } catch (error) {
+      console.error('Error:', error);
     }
-
-    if (apt.email) {
-      try {
-        await emailjs.send(SERVICE_ID, TEMPLATE_CLIENT_ID, {
-          client_name: apt.name,
-          client_email: apt.email,
-          service: apt.service,
-          date: apt.date,
-          time: apt.time,
-          persons: apt.persons ?? 1,
-          products: apt.products ?? 'Ninguno',
-          status: status === 'accepted' ? '✅ Confirmada' : '❌ Rechazada',
-          message: status === 'accepted'
-            ? '¡Tu cita ha sido confirmada! Te esperamos puntual.'
-            : 'Lo sentimos, tu cita no pudo ser confirmada. Por favor contáctanos para reagendar.',
-        });
-      } catch (error) {
-        console.error('Error enviando email:', error);
-      }
-    }
-
-    loadAppointments();
   };
 </script>

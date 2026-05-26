@@ -1,0 +1,151 @@
+---
+const id = Astro.url.searchParams.get('id');
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cancelar Cita — El Balcón Barber Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+      @import "tailwindcss";
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background-color: #0A0A0A; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; font-family: 'DM Sans', sans-serif; }
+
+      .card { background: #111; border: 1px solid rgba(255,255,255,0.1); padding: 2rem; width: 100%; max-width: 28rem; }
+      .logo { text-align: center; margin-bottom: 2.5rem; font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.1em; }
+      .logo span { color: #BFFF00; }
+      .label { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: #BFFF00; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+      .title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: white; margin-bottom: 1rem; }
+      .subtitle { color: #9CA3AF; font-size: 0.875rem; line-height: 1.6; margin-bottom: 1.5rem; }
+      .apt-info { background: #0A0A0A; border: 1px solid rgba(255,255,255,0.1); padding: 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+      .apt-info p { font-family: 'Space Mono', monospace; font-size: 0.75rem; }
+      .btn-cancel { flex: 1; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #F87171; padding: 0.75rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: background 0.2s; }
+      .btn-cancel:hover { background: rgba(239,68,68,0.2); }
+      .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+      .btn-back { flex: 1; background: #BFFF00; color: black; font-weight: bold; padding: 0.75rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; text-decoration: none; transition: background 0.2s; }
+      .btn-back:hover { background: rgba(191,255,0,0.8); }
+      .btn-row { display: flex; gap: 0.75rem; }
+      .hidden { display: none !important; }
+      .text-center { text-align: center; }
+      .emoji { font-size: 3rem; margin-bottom: 1rem; }
+      .success-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: white; margin-bottom: 0.5rem; }
+      .success-text { color: #9CA3AF; font-size: 0.875rem; margin-bottom: 1.5rem; }
+      .btn-home { display: block; background: #BFFF00; color: black; font-weight: bold; padding: 0.75rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; text-decoration: none; margin-top: 1rem; }
+      .btn-home-outline { display: block; border: 1px solid rgba(255,255,255,0.1); color: #9CA3AF; padding: 0.75rem; font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; text-align: center; text-decoration: none; margin-top: 1rem; }
+    </style>
+  </head>
+
+  <body>
+    <div style="width: 100%; max-width: 28rem;">
+
+      <!-- Logo -->
+      <div class="logo">EL BALCÓN <span>BARBER STUDIO</span></div>
+
+      <!-- Card -->
+      <div class="card">
+
+        <!-- Panel confirmar -->
+        <div id="confirm-panel">
+          <p class="label">— Cancelación de cita</p>
+          <h2 class="title">¿CANCELAR TU CITA?</h2>
+          <p class="subtitle">Esta acción no se puede deshacer. ¿Estás seguro que deseas cancelar tu cita?</p>
+
+          <div id="apt-info" class="apt-info">
+            <p style="color: #4B5563;">Cargando información...</p>
+          </div>
+
+          <div class="btn-row">
+            <button id="cancel-btn" class="btn-cancel">Sí, cancelar</button>
+            <a href="/" class="btn-back">No, volver</a>
+          </div>
+        </div>
+
+        <!-- Panel éxito -->
+        <div id="success-panel" class="hidden text-center">
+          <div class="emoji">✅</div>
+          <h2 class="success-title">¡CITA CANCELADA!</h2>
+          <p class="success-text">Tu cita ha sido cancelada exitosamente. Te hemos enviado un correo de confirmación.</p>
+          <a href="/" class="btn-home">Volver al inicio</a>
+        </div>
+
+        <!-- Panel error -->
+        <div id="error-panel" class="hidden text-center">
+          <div class="emoji">❌</div>
+          <h2 class="success-title">ERROR</h2>
+          <p id="error-msg" class="success-text">No se pudo cancelar la cita.</p>
+          <a href="/" class="btn-home-outline">Volver al inicio</a>
+        </div>
+
+      </div>
+    </div>
+
+    <script define:vars={{ id }}>
+      const aptInfo = document.getElementById('apt-info');
+      const cancelBtn = document.getElementById('cancel-btn');
+      const confirmPanel = document.getElementById('confirm-panel');
+      const successPanel = document.getElementById('success-panel');
+      const errorPanel = document.getElementById('error-panel');
+      const errorMsg = document.getElementById('error-msg');
+
+      async function loadAppointment() {
+        if (!id) { showError('Link de cancelación inválido.'); return; }
+
+        try {
+          const res = await fetch('/api/appointments?id=' + id);
+          const apt = await res.json();
+
+          if (!apt || apt.error) { showError('No se encontró la cita.'); return; }
+          if (apt.status === 'cancelled') { showError('Esta cita ya fue cancelada.'); return; }
+          if (apt.status === 'rejected') { showError('Esta cita ya fue rechazada.'); return; }
+
+          if (aptInfo) {
+            aptInfo.innerHTML = `
+              <p style="color: white;">👤 ${apt.name}</p>
+              <p style="color: #BFFF00;">✂️ ${apt.service}</p>
+              <p style="color: #9CA3AF;">📅 ${apt.date} &nbsp;·&nbsp; ⏰ ${apt.time} hrs</p>
+              <p style="color: #6B7280;">👥 ${apt.persons ?? 1} persona(s)</p>
+            `;
+          }
+        } catch (e) {
+          showError('Error al cargar la cita.');
+        }
+      }
+
+      cancelBtn?.addEventListener('click', async () => {
+        cancelBtn.textContent = 'Cancelando...';
+        cancelBtn.disabled = true;
+
+        try {
+          const res = await fetch('/api/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+          });
+
+          if (res.ok) {
+            confirmPanel.classList.add('hidden');
+            successPanel.classList.remove('hidden');
+          } else {
+            const data = await res.json();
+            showError(data.error ?? 'No se pudo cancelar.');
+          }
+        } catch (e) {
+          showError('Error al cancelar la cita.');
+        }
+      });
+
+      function showError(msg) {
+        if (confirmPanel) confirmPanel.classList.add('hidden');
+        if (errorPanel) errorPanel.classList.remove('hidden');
+        if (errorMsg) errorMsg.textContent = msg;
+      }
+
+      loadAppointment();
+    </script>
+
+  </body>
+</html>
