@@ -104,7 +104,7 @@
 </section>
 
 <script>
-  const savedStatus = localStorage.getItem('barber_status') ?? 'open';
+import { string } from "astro:schema";
 
   const badge = document.getElementById('status-badge');
   const dot = document.getElementById('status-dot');
@@ -116,7 +116,7 @@
       badge?.classList.add('bg-[#BFFF00]/10', 'border-[#BFFF00]/30');
       dot?.classList.remove('bg-red-500');
       dot?.classList.add('bg-[#BFFF00]');
-      if (text) text.textContent = 'Abierto hoy · 9am – 8pm';
+      if (text) text.textContent = 'Abierto hoy · 10am – 8pm';
       text?.classList.remove('text-red-400');
       text?.classList.add('text-[#BFFF00]');
     } else {
@@ -130,13 +130,22 @@
     }
   }
 
-  applyStatus(savedStatus);
+  // Cargar estatus desde API
+  async function loadStatus() {
+    try {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      applyStatus(data.status);
+      localStorage.setItem('barber_status', data.status);
+    } catch {
+      const cached = localStorage.getItem('barber_status') ?? 'open';
+      applyStatus(cached);
+    }
+  }
 
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'barber_status') applyStatus(e.newValue ?? 'open');
-  });
+  loadStatus();
 
-  window.addEventListener('statusChanged', (e: any) => {
-    applyStatus(e.detail.status);
+  window.addEventListener('statusChanged', (e) => {
+    applyStatus((e as CustomEvent).detail.estatus);
   });
 </script>

@@ -198,9 +198,18 @@
     }
   }
 
-  statusToggle?.addEventListener('click', () => {
+  statusToggle?.addEventListener('click', async () => {
+
     isOpen = !isOpen;
     const newStatus = isOpen ? 'open' : 'closed';
+
+    //Guardar en SUPABASE VIA API
+    await fetch ('/api/status', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
     localStorage.setItem('barber_status', newStatus);
     updateToggleUI();
     window.dispatchEvent(new CustomEvent('statusChanged', { detail: { status: newStatus } }));

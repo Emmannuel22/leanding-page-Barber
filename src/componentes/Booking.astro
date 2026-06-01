@@ -219,11 +219,19 @@
 
   loadProducts();
 
-  // Estatus abierto/cerrado
-  function checkStatus() {
-    const status = localStorage.getItem('barber_status') ?? 'open';
-    if (status === 'closed') blockForm();
-    else unblockForm();
+  // Estatus abierto/cerrado desde API
+  async function checkStatus() {
+    try {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+      localStorage.setItem('barber_status', data.status);
+      if (data.status === 'closed') blockForm();
+      else unblockForm();
+    } catch {
+      const cached = localStorage.getItem('barber_status') ?? 'open';
+      if (cached === 'closed') blockForm();
+      else unblockForm();
+    }
   }
 
   function blockForm() {
@@ -243,10 +251,6 @@
   }
 
   checkStatus();
-
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'barber_status') checkStatus();
-  });
 
   window.addEventListener('statusChanged', (e: any) => {
     if (e.detail.status === 'closed') blockForm();
@@ -291,7 +295,6 @@
     btn.textContent = 'Enviando...';
 
     try {
-      // Guardar cita via API
       const res = await fetch('/api/appointments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -312,7 +315,6 @@
 
       if (!res.ok) throw new Error('Error al guardar la cita');
 
-      // Enviar email al dueño
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
         client_name: name,
         client_phone: phone,
@@ -328,7 +330,6 @@
       }, 500);
 
     } catch (error) {
-      console.error('Error:', error);
       alert('⚠️ Hubo un error al enviar la reserva. Intenta de nuevo.');
       (btn as HTMLButtonElement).disabled = false;
       btn.textContent = 'Confirmar Reserva →';
