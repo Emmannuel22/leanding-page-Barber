@@ -85,7 +85,7 @@ export class EmailObserver implements Observer {
       message: status === 'accepted'
         ? '¡Tu cita ha sido confirmada! Te esperamos puntual.'
         : 'Lo sentimos, tu cita no pudo ser confirmada. Por favor contáctanos para reagendar.',
-      cancel_link: `http://localhost:4321/cancelar?id=${apt.id}`,
+      cancel_link: `https://elbalcon-barber.up.railway.app/cancelar?id=${apt.id}`,
     });
   }
 
