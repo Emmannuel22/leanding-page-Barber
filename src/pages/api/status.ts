@@ -7,7 +7,7 @@ export const GET: APIRoute = async () => {
     const supabase = getSupabase();
 
     const { data, error } = await (supabase as any)
-      .from('settings')
+      .from('setting')
       .select('value')
       .eq('key', 'barber_status')
       .single();
@@ -37,7 +37,7 @@ export const PATCH: APIRoute = async (context) => {
     console.log('Actualizando estatus a:', status);
 
     const { error } = await (supabase as any)
-      .from('settings')
+      .from('setting')
       .update({ value: status })
       .eq('key', 'barber_status');
 
