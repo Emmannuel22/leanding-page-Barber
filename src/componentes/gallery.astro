@@ -1,14 +1,14 @@
 ---
 const works = [
-  { id: 1, title: 'Corte Clásico', tag: 'Clásico' },
-  { id: 2, title: 'Corte Clásico', tag: 'Clásico' },
-  { id: 3, title: 'Corte Fade', tag: 'Fade' },
-  { id: 4, title: 'Corte Fade', tag: 'Fade' },
-  { id: 5, title: 'Arreglo de Barba', tag: 'Barba' },
-  { id: 6, title: 'Arreglo de Barba', tag: 'Barba' },
-  { id: 7, title: 'Cejas', tag: 'Cejas' },
-  { id: 8, title: 'Corte + Barba', tag: 'Combo' },
-  { id: 9, title: 'Fade + Barba', tag: 'Combo' },
+  { id: 1, title: 'Corte Clásico', tag: 'Clásico', img: '/images/fade7.jpeg'},
+  { id: 2, title: 'Corte Clásico', tag: 'Clásico', img: '/images/fade2.jpeg' },
+  { id: 3, title: 'Corte Fade', tag: 'Fade', img: '/images/fade3.jpeg' },
+  { id: 4, title: 'Corte Fade', tag: 'Fade', img: '/images/fade4.jpeg' },
+  { id: 5, title: 'Arreglo de Barba', tag: 'Barba', img: '/images/fadebarba.jpeg' },
+  { id: 6, title: 'Arreglo de Barba', tag: 'Barba', img: '/images/fade1.jpeg' },
+  { id: 7, title: 'Cejas', tag: 'Cejas', img: '/images/fade5.jpeg' },
+  { id: 8, title: 'Corte + Barba', tag: 'Combo', img: '/images/fade6.jpeg' },
+  { id: 9, title: 'Fade + Barba', tag: 'Combo', img: '/images/fade8.jpeg' },
 ];
 
 const tags = ['Todos', 'Clásico', 'Fade', 'Barba', 'Cejas', 'Combo'];
@@ -49,12 +49,11 @@ const tags = ['Todos', 'Clásico', 'Fade', 'Barba', 'Cejas', 'Combo'];
           class="gallery-item group relative aspect-square bg-[#1A1A1A] border border-white/10 overflow-hidden cursor-pointer"
         >
           <!-- Placeholder -->
-          <div class="w-full h-full flex items-center justify-center">
-            <div class="text-center">
-              <div class="text-4xl mb-2">📸</div>
-              <p class="font-['Space_Mono'] text-xs text-gray-700">Foto {work.id}</p>
-            </div>
-          </div>
+          <img
+            src={work.img}
+            alt={work.title}
+            class="w-full h-full object-cover"
+          />
 
           <!-- Overlay hover -->
           <div class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-2">
