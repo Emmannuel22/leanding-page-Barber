@@ -10,7 +10,7 @@
       <div class="space-y-8">
         <div>
           <p class="font-['Space_Mono'] text-xs text-[#BFFF00] tracking-widest uppercase mb-3">— Agenda tu turno</p>
-          <h2 class="font-['Bebas_Neue'] text-6xl md:text-7xl text-white leading-none">
+          <h2 class="font-['Bebas_Neue'] text-5xl md:text-7xl text-white leading-none">
             RESERVA<br /><span class="text-[#BFFF00]">TU CITA</span>
           </h2>
         </div>
@@ -49,7 +49,7 @@
       </div>
 
       <!-- Lado derecho: formulario -->
-      <div class="bg-[#111] border border-white/10 p-8 space-y-5">
+      <div class="bg-[#111] border border-white/10 p-6 md:p-8 space-y-5">
         <p class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Completa el formulario</p>
 
         <!-- Nombre -->
@@ -75,12 +75,13 @@
             class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors placeholder-gray-700"
           />
         </div>
-        
+
         <!-- Número de personas -->
         <div class="space-y-1">
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">¿Para cuántas personas?</label>
           <select id="persons"
             class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors cursor-pointer"
+            style="-webkit-appearance: none; appearance: none;"
           >
             <option value="1">1 persona</option>
             <option value="2">2 personas</option>
@@ -92,6 +93,7 @@
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Servicio</label>
           <select id="service"
             class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors cursor-pointer"
+            style="-webkit-appearance: none; appearance: none;"
           >
             <option value="" disabled selected>Selecciona un servicio</option>
             <option value="corte_clasico">Corte Clásico — $120</option>
@@ -104,17 +106,19 @@
         </div>
 
         <!-- Fecha y Hora -->
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-1">
             <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Fecha</label>
             <input type="date" id="date"
-              class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors [color-scheme:dark]"
+              class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors"
+              style="color-scheme: dark; -webkit-appearance: none; appearance: none; min-height: 48px;"
             />
           </div>
           <div class="space-y-1">
             <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Hora</label>
             <select id="time"
               class="w-full bg-[#0A0A0A] border border-white/10 text-white text-sm px-4 py-3 focus:outline-none focus:border-[#BFFF00] transition-colors cursor-pointer"
+              style="-webkit-appearance: none; appearance: none;"
             >
               <option value="" disabled selected>Hora</option>
               {['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00'].map(t => (
@@ -124,7 +128,7 @@
           </div>
         </div>
 
-        <!-- Productos opcionales — dinámico desde Supabase -->
+        <!-- Productos opcionales -->
         <div class="space-y-2">
           <label class="font-['Space_Mono'] text-xs text-gray-500 uppercase tracking-widest">Productos opcionales</label>
           <p class="font-['Space_Mono'] text-xs text-gray-700">Agrega un producto a tu cita (opcional)</p>

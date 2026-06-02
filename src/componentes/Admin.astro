@@ -5,7 +5,7 @@
 <!-- Botón flotante -->
 <button
   id="admin-btn"
-  class="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] border border-white/20 text-white w-12 h-12 flex items-center justify-center hover:border-[#BFFF00] hover:text-[#BFFF00] transition-all duration-300"
+  class="fixed bottom-24 right-6 z-50 bg-[#1A1A1A] border border-white/20 text-white w-12 h-12 flex items-center justify-center hover:border-[#BFFF00] hover:text-[#BFFF00] transition-all duration-300"
   aria-label="Panel admin"
 >
   🔐
@@ -173,7 +173,7 @@
       loginPanel?.classList.add('hidden');
       controlPanel?.classList.remove('hidden');
       loginError?.classList.add('hidden');
-      await loadStatus,
+      await loadStatus(),
       loadProducts();
       loadAppointments();
       pollingInterval = setInterval(() => loadAppointments(), 30000);
